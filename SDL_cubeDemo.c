@@ -2,12 +2,12 @@
 //clang SDL_cubeDemo.c -o main -I/opt/homebrew/cellar/sdl2/2.28.4/include/sdl2 -L/opt/homebrew/cellar/sdl2/2.28.4/lib -lSDL2
 #include <SDL.h>
 #include <string.h>
-#include "raster/rasterizer.c"
-#include "3Dmath/operations.c"
-#include "engineTypes.h"
-#include "graphicsEngineFunctions.c"
+#include "GraphicsEngeine/raster/rasterizer.c"
+#include "GraphicsEngine/3Dmath/operations.c"
+#include "GraphicsEngine/engineTypes.h"
+#include "GraphicsEngine/graphicsEngineFunctions.c"
 #include "commonCoords.c"
-#include "OBJParser/parser.c"
+#include "GraphicsEngine/OBJParser/parser.c"
 
 #define TRANSLATION_SPEED 0.1f
 #define ANGLE_INCREMENT 1.0f
