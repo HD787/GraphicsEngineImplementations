@@ -38,30 +38,32 @@ webContext* initialize(int height, int width){
 EMSCRIPTEN_KEEPALIVE
 webContext* initializeFromObj(int height, int width){
     webContext* wc = malloc(sizeof(webContext));
-    object* obj = parseNoMTL("forestPondFixed.obj");
+    wc->rc = createRenderContext_RGBA(height, width);
+
+    object* obj = parseNoMTL("forestPondFIXED.obj");
+
     vertexBuffer* vb0 = createVertexBuffer(obj->faceCount * 9);
     memcpy(vb0->inputVertices, obj->faces, sizeof(float) * obj->faceCount * 9);
-
     normalBuffer* nb0 = generateNormals(vb0);
     colorBuffer* cb0 = createColorBuffer(obj->faceCount * 9);
     for(int i = 0; i < cb0->length; i++) cb0->inputColors[i] = 127;
     mesh* mesh0 = meshify(vb0, cb0, nb0);
+    // deleteObjNoMtl(obj);
 
-    scene* sc = createScene(1);
-    sc->meshes[0] = mesh0;
+    wc->sc = createScene(1);
+    wc->sc->meshes[0] = mesh0;
     //this is currently hardcoded in the transforms, take some time to fix all the demos
-    sc->lightVector = malloc(sizeof(vec3)); 
-    sc->lightVector->x = 0; sc->lightVector->y = 0; sc->lightVector->z = -1;
-
+    // sc->lightVector = malloc(sizeof(vec3)); 
+    // sc->lightVector->x = 0; sc->lightVector->y = 0; sc->lightVector->z = -1;
 
     wc->ts = malloc(sizeof(transformSpec));
     wc->ts->translateX = 0;
     wc->ts->translateY = 0;
-    wc->ts->translateZ = 5;
-    wc->ts->rotateX = 0.0;
+    wc->ts->translateZ = 20;
+    wc->ts->rotateX = 180.0;
     wc->ts->rotateY = 0.0;
     wc->ts->rotateZ = 0.0;
-    
+
     return wc;
 }
 

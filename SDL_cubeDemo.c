@@ -76,16 +76,16 @@ int main(){
     sc->meshes[2] = mesh2;
 
     //lighting vector
-    vec3 light; light.x = 0; light.y = -1; light.z = 0;
+    vec3 light; light.x = 0.0f; light.y = 0.0f; light.z = -1.0f;
     
 
     //movement variables
-    float mx = 0;
-    float my = 0;
-    float mz = 5;
-    float angleX = 0.0;
-    float angleY = 0.0;
-    float angleZ = 0.0;
+    float mx = 0.0f;
+    float my = 0.0f;
+    float mz = 5.0f;
+    float angleX = 0.0f;
+    float angleY = 0.0f;
+    float angleZ = 0.0f;
 
     //update matrices
     matrix4x4 rotationMatrixX, rotationMatrixY, rotationMatrixZ, translationMatrix, scalingMatrix, perspectiveProjectionMatrix, screenSpaceMatrix;

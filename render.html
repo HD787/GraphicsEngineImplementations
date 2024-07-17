@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>graphics</title>
 </head>
-<style src="render.css"></style>
+<link rel="stylesheet" href="render.css">
 <div>
     <button id="loadForest"> load forest </button>
     <button id="loadCube"> load cube </button>
@@ -36,9 +36,13 @@
             const pixelData = new Uint8ClampedArray(Module.HEAPU8.buffer, pixelDataPtr, canvas.width * canvas.height * 4);
             ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            console.log("1:", wcPtr);
             renderPass(wcPtr, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
             imageData = new ImageData(pixelData, canvas.width, canvas.height);
+            for(i = 0; i < pixelData.length; i++){
+                if(pixelData[i] != 0 && pixelData[i] != 255) {
+                    console.log(pixelData[i]);
+                }
+            }
             ctx.putImageData(imageData, 0, 0);
         };
 

@@ -58,7 +58,7 @@ int main(){
     calculateCentroid(mesh0);
     createTranslationMatrix(mesh0->centroid->x,mesh0->centroid->y, mesh0->centroid->z, center);
     vertexBufferByMatrix(vb0, center);
-    delete(obj);
+    deleteObjNoMtl(obj);
 
 
     //lighting vector
