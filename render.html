@@ -30,19 +30,24 @@
             renderPass = Module._renderPass; 
             getFrameBuffer = Module._getFrameBuffer;
             deleteWebContext = Module._deleteWebContext;
+            const misc = Module._misc;
 
             wcPtr = initializeFromObj(canvas.width, canvas.height);
+            console.log(wcPtr);
             const pixelDataPtr = getFrameBuffer(wcPtr);
             const pixelData = new Uint8ClampedArray(Module.HEAPU8.buffer, pixelDataPtr, canvas.width * canvas.height * 4);
             ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             renderPass(wcPtr, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
             imageData = new ImageData(pixelData, canvas.width, canvas.height);
-            for(i = 0; i < pixelData.length; i++){
-                if(pixelData[i] != 0 && pixelData[i] != 255) {
-                    console.log(pixelData[i]);
-                }
-            }
+            vbPtr = misc(wcPtr);
+            console.log(vbPtr);
+            // const vertexData = new Float32Array(Module.HEAPF32.buffer, vbPtr, 50);
+            // for(i = 0; i < vertexData.length; i++){
+            //     if(vertexData[i] != 0 ) {
+            //         console.log(vertexData[i]);
+            //     }
+            // }
             ctx.putImageData(imageData, 0, 0);
         };
 

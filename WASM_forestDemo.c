@@ -1,4 +1,4 @@
-//emcc -o WASM_forestDemo.js WASM_forestDemo.c -s EXPORTED_FUNCTIONS='["_initialize", "_renderPass", "_getFrameBuffer", "_deleteWebContext", "_initializeFromObj"]' -s --preload-file forestpondFIXED.obj
+//emcc -o WASM_forestDemo.js WASM_forestDemo.c -s EXPORTED_FUNCTIONS='["_initialize", "_renderPass", "_getFrameBuffer", "_deleteWebContext", "_initializeFromObj", "_misc"]' -s --preload-file forestPondFIXED.obj
 #include <string.h>
 #include <emscripten.h>
 #include "GraphicsEngine/raster/rasterizer.c"
@@ -48,7 +48,7 @@ webContext* initializeFromObj(int height, int width){
     colorBuffer* cb0 = createColorBuffer(obj->faceCount * 9);
     for(int i = 0; i < cb0->length; i++) cb0->inputColors[i] = 127;
     mesh* mesh0 = meshify(vb0, cb0, nb0);
-    // deleteObjNoMtl(obj);
+    deleteObjNoMtl(obj);
 
     wc->sc = createScene(1);
     wc->sc->meshes[0] = mesh0;
@@ -65,6 +65,7 @@ webContext* initializeFromObj(int height, int width){
     wc->ts->rotateZ = 0.0;
 
     return wc;
+    
 }
 
 EMSCRIPTEN_KEEPALIVE
@@ -94,16 +95,20 @@ uint8_t* getFrameBuffer(webContext* wc){
     return wc->rc->frameBuffer;
 }
 
+EMSCRIPTEN_KEEPALIVE
+int misc(webContext* wc){
+    return wc->sc->meshes[0]->vb->length;
+}
 
 
 // int main(){
-//     webContext* wc = initialize(100, 100);
+//     webContext* wc = initializeFromObj(800, 600);
 //     renderPass(wc, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 //     renderPass(wc, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 //     // unsigned char* ptr = getFrameBuffer(wc);
 //     renderPass(wc, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-//     for(int i = 0; i < wc->sc->meshes[0]->vb->length; i++){
-//         //if(wc->sc->meshes[0]->vb->inputVertices[i] == -1000000)
-//         printf(" %f : %p\n ", wc->sc->meshes[0]->vb->inputVertices[i], wc->sc->meshes[0]->vb->inputVertices + i);
+//     for(int i = 0; i < wc->rc->height * wc->rc->width * 4; i+=4){
+//         if(wc->rc->frameBuffer[i] != 0 && wc->rc->frameBuffer[i] != 254)
+//         printf(" %d, %d, %d, %d : %p\n ", wc->rc->frameBuffer[i], wc->rc->frameBuffer[i + 1],  wc->rc->frameBuffer[i + 2],  wc->rc->frameBuffer[i + 3], wc->rc->frameBuffer + i);
 //     }
 // } 
