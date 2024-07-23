@@ -6,22 +6,80 @@
     <title>graphics</title>
 </head>
 <link rel="stylesheet" href="render.css">
-<div>
-    <button id="loadForest"> load forest </button>
-    <button id="loadCube"> load cube </button>
-</div>
+
 <body>
-    <canvas id="myCanvas" repetition="no-repeat"></canvas>
+    <div class="row">
+        <div class="column left">
+            <canvas id="myCanvas" repetition="no-repeat"></canvas>
+            <div>
+                <button id="loadForest"> load forest </button>
+                <button id="loadCube"> load cube </button>
+            </div>
+        </div>
+
+        <div class="column right">
+            <button class="toggleButton" id="controlsButton" data-target="controls">Controls</button>
+            <button class="toggleButton" id="transformsButton" data-target="transforms">Transforms</button>
+            <button class="toggleButton" id="colorsButton" data-target="colors">Colors</button>
+            <button class="toggleButton" id="explodeModelButton" data-target="explodeModel">Explode Model</button>
+        
+            <div id="controls">
+                <h2>Controls</h2>
+                <h3>W: Translate Up</h3>
+                <h3>A: Translate Left</h3>
+                <h3>S: Translate Down</h3>
+                <h3>D: Translate Right</h3>
+                <h3>C: Translate Forward</h3>
+                <h3>Space: Translate Back</h3>
+                <h3>E: Rotate Up About Y-Axis</h3>
+                <h3>F: Rotate Down About Y-Axis</h3>
+                <h3>R: Rotate Up About X-Axis</h3>
+                <h3>G: Rotate Down About X-Axis</h3>
+                <h3>T: Rotate Up About Z-Axis</h3>
+                <h3>H: Rotate Down About Z-Axis</h3>
+            </div>
+        
+            <div id="transforms" class="hidden"> 
+                <h2>Section 2</h2>
+                <form>
+                    <label for="input2">Input 2:</label>
+                    <input type="text" id="input2" name="input2"><br><br>
+                    <button type="button" onclick="alert('Button 2 clicked!')">Submit 2</button>
+                </form>
+            </div>
+        
+            <div id="colors" class="hidden" display="none">
+                <h2>Section 3</h2>
+                <form>
+                    <label for="input3">Input 3:</label>
+                    <input type="text" id="input3" name="input3"><br><br>
+                    <button type="button" onclick="alert('Button 3 clicked!')">Submit 3</button>
+                </form>
+            </div>
+
+            <div id="explodeModel" class="hidden" display="none">
+                <h2>Section 3</h2>
+                <form>
+                    <label for="input3">Input 3:</label>
+                    <input type="text" id="input3" name="input3"><br><br>
+                    <button type="button" onclick="alert('Button 3 clicked!')">Submit 3</button>
+                </form>
+            </div>
+
+        </div> 
+    </div>
+
+
+
     <script src="WASM_forestDemo.js"></script>
     <script src="globalFuncs.js"></script>
     <script>
         var wcPtr, ctx, imageData;
         var initialize, renderPass, getFrameBuffer, initializeFromObj, deleteWebContext;
         var keyStates = {};
-        var rx = 0.0, ry = 0.0, rz = 0.0;
         const canvas = document.getElementById('myCanvas');
-        canvas.width = 800;
-        canvas.height = 600;
+        canvas.width = window.innerWidth / 1.8;
+        canvas.height = window.innerHeight / 1.2;
 
         Module.onRuntimeInitialized = () => { 
             
@@ -30,32 +88,22 @@
             renderPass = Module._renderPass; 
             getFrameBuffer = Module._getFrameBuffer;
             deleteWebContext = Module._deleteWebContext;
-            const misc = Module._misc;
+            //const misc = Module._misc;
 
-            wcPtr = initializeFromObj(canvas.width, canvas.height);
-            console.log(wcPtr);
+            wcPtr = initialize(canvas.width, canvas.height);
             const pixelDataPtr = getFrameBuffer(wcPtr);
             const pixelData = new Uint8ClampedArray(Module.HEAPU8.buffer, pixelDataPtr, canvas.width * canvas.height * 4);
             ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             renderPass(wcPtr, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
             imageData = new ImageData(pixelData, canvas.width, canvas.height);
-            vbPtr = misc(wcPtr);
-            console.log(vbPtr);
-            // const vertexData = new Float32Array(Module.HEAPF32.buffer, vbPtr, 50);
-            // for(i = 0; i < vertexData.length; i++){
-            //     if(vertexData[i] != 0 ) {
-            //         console.log(vertexData[i]);
-            //     }
-            // }
+            //vbPtr = misc(wcPtr);
+            //console.log(vbPtr);
             ctx.putImageData(imageData, 0, 0);
         };
 
         window.addEventListener('keydown', (event) => {
             keyStates[event.code] = true;
-            if (event.code === 'ShiftLeft') {
-                event.preventDefault();
-            }
             transform();
         });
 
@@ -64,9 +112,29 @@
         });
 
         document.getElementById('loadForest').addEventListener('click', function() {
+            event.target.blur()
             deleteWebContext(wcPtr);
             wcPtr = initializeFromObj(canvas.width, canvas.height);
+            const pixelDataPtr = getFrameBuffer(wcPtr);
+            const pixelData = new Uint8ClampedArray(Module.HEAPU8.buffer, pixelDataPtr, canvas.width * canvas.height * 4);
             renderPass(wcPtr, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+            imageData = new ImageData(pixelData, canvas.width, canvas.height);
+            ctx.putImageData(imageData, 0, 0);
+        });
+
+        document.getElementById('loadCube').addEventListener('click', function() {
+            event.target.blur()
+            deleteWebContext(wcPtr);
+            wcPtr = initialize(canvas.width, canvas.height);
+            const pixelDataPtr = getFrameBuffer(wcPtr);
+            const pixelData = new Uint8ClampedArray(Module.HEAPU8.buffer, pixelDataPtr, canvas.width * canvas.height * 4);
+            renderPass(wcPtr, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+            imageData = new ImageData(pixelData, canvas.width, canvas.height);
+            ctx.putImageData(imageData, 0, 0);
+        });
+
+        document.querySelectorAll('.toggleButton').forEach(button => {
+            button.addEventListener('click', changeMenus);
         });
 
     </script>

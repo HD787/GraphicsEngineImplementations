@@ -1,6 +1,31 @@
-body, html {
-    height: 100%;
-    margin: 0;
-    display: grid;
-    place-items: center;
-  }
+* {
+  box-sizing: border-box;
+}
+.column {
+  float: left;
+  width: 50%;
+  padding: 10px;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.left {
+  width: 60%;
+}
+
+.right {
+  width: 40%;
+}
+
+.hidden{
+  display: none;
+}
+
+.toggleButton{
+  margin: 3px;
+}
