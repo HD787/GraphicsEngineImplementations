@@ -29,3 +29,7 @@
 .toggleButton{
   margin: 3px;
 }
+
+input{
+  width: 9%;
+}
