@@ -2,7 +2,7 @@
 //clang SDL_cubeDemo.c -o main -I/opt/homebrew/cellar/sdl2/2.28.4/include/sdl2 -L/opt/homebrew/cellar/sdl2/2.28.4/lib -lSDL2
 #include <SDL.h>
 #include <string.h>
-#include "GraphicsEngeine/raster/rasterizer.c"
+#include "GraphicsEngine/raster/rasterizer.c"
 #include "GraphicsEngine/3Dmath/operations.c"
 #include "GraphicsEngine/engineTypes.h"
 #include "GraphicsEngine/graphicsEngineFunctions.c"
@@ -182,7 +182,7 @@ int main(){
                 vb->vertices[i] = temp.x;
                 vb->vertices[i + 1] = temp.y;
                 vb->vertices[i + 2] = temp.w * 20;
-                printf("%f : %f\n", temp.w, temp.z);
+                printf("%f : %f\n", temp.x, temp.z);
                 //printf("%i, %d, %d\n", cb->inputColors[i], cb->inputColors[i + 1], cb->inputColors[i + 2]);
             }
             rasterize(rc, vb, cb);
