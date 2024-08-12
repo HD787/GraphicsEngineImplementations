@@ -1,5 +1,6 @@
-__kernel void vector_matrix_multiply(__global const float* matrix, 
-                                     __global const float* vector, 
+
+const char *kernelSource = "__kernel void vector_matrix_multiply(__global const float* vector, 
+                                     __global const float* matrix, 
                                      __global float* result, 
                                      const int N) {
     // Get the row index of the work-item
@@ -15,4 +16,4 @@ __kernel void vector_matrix_multiply(__global const float* matrix,
 
     // Store the result
     result[row] = sum;
-}
+}"
