@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <OpenCL/opencl.h>
 
-#include "tranformKernal.cl"
+#include "vertexTransformKernel.cl"
+#include "normalTransformKernel.cl"
 
 
-int main() {
+int vertexKernal(renderContext* rc, ) {
 
     float matrix[16] = { 1.0f, 0.0f, 0.0f, 5.0f,
                          0.0f, 1.0f, 0.0f, 4.0f,
@@ -14,7 +15,7 @@ int main() {
                        };
     float vector[4] = { 6.0f, 7.0f, 8.0f, 9.0f };
 
-    float result[4]
+    float result[4];
 
     cl_platform_id platform_id = NULL;
     cl_uint ret_num_platforms;
@@ -26,36 +27,50 @@ int main() {
 
 
     cl_context context = clCreateContext(NULL, 1, &device_id, NULL, NULL, NULL);
-    strlen(kernalSource);
-    cl_program program = clCreateProgramWithSource(context, 1, &kernalSource, &source_size, NULL);
+    int lenArray[2] = { strlen(vertexKernelSource), strlen(normalKernelSource) };
+    char* kernelSources[2] = { vertexKernelSource, normalKernelSource };
+    cl_program program = clCreateProgramWithSource(context, 1, &kernelSources, lenArray, NULL);
     clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
 
-    cl_kernel kernel = clCreateKernel(program, "vector_matrix_multiply", NULL);
+    cl_kernel vectorKernal = clCreateKernel(program, "vector_matrix_multiply", NULL);
+    cl_kernel normalKernal = clCreateKernal()
 
     cl_command_queue command_queue = clCreateCommandQueue(context, device_id, 0, NULL);
 
     
-    size_t global_work_size = 4; // Total number of work items
-    size_t local_work_size = 4;  // Number of work items per work-group (optional)
+    size_t global_work_size = 4;
+    size_t local_work_size = 4;
 
-    clEnqueueNDRangeKernel(command_queue, kernel, 1, NULL, &global_work_size, &local_work_size, 0, NULL, NULL);
 
-    vector_buffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(vector), NULL, NULL);
-    matrix_buffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(matrix), NULL, NULL);
-    result_buffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(result), NULL, NULL);
+    cl_mem vertexBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(vector), NULL, NULL);
+    cl_mem matrixBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(matrix), NULL, NULL);
+    cl_mem vertexResultBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(result), NULL, NULL);
+    cl_mem normalBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(result), NULL, NULL);
+    cl_mem normalResultBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(result), NULL, NULL);
 
+    //NOT DONE
     clEnqueueWriteBuffer(command_queue, matrix_buffer, CL_TRUE, 0, sizeof(matrix), matrix, 0, NULL, NULL);
-    clEnqueueWriteBuffer(command_queue, vector_buffer, CL_TRUE, 0, sizeof(vector), vector 0, NULL, NULL);
+    clEnqueueWriteBuffer(command_queue, vector_buffer, CL_TRUE, 0, sizeof(vector), vector, 0, NULL, NULL);
+    clEnqueueWriteBuffer(command_queue, vector_buffer, CL_TRUE, 0, sizeof(vector), vector, 0, NULL, NULL);
+
+
+
+    clSetKernelArg(vectorKernal, 0, sizeof(cl_mem), &vertexBuffer);
+    clSetKernelArg(vectorKernal, 1, sizeof(cl_mem), &matrixBuffer);
+    clSetKernelArg(vectorKernal, 2, sizeof(cl_mem), &vertexResultBuffer);
+    //ADD MORE
+    clSetKernelArg(vectorKernal, 3, sizeof(int), &(int){4});
+    //NOT DONE
+    clEnqueueNDRangeKernel(command_queue, vectorKernal, 1, NULL, &global_work_size, &local_work_size, 0, NULL, NULL);
 
     clEnqueueReadBuffer(command_queue, result_buffer, CL_TRUE, 0, sizeof(result), result, 0, NULL, NULL);
 
-    clSetKernelArg(kernal, 0, sizeof(vector), vector_buffer);
-    clSetKernelArg(kernal, 1, sizeof(matrix), matrix_buffer);
-    clSetKernelArg(kernal, 2, sizeof(result), result_buffer);
-    clSetKernelArg(kernal, 3, sizeof(vector), &(int){4});
+    for(int i=0;i < 4; i++){
+        printf("%f ",result[i]);
+    }
 
     clReleaseCommandQueue(command_queue);
-    clReleaseKernel(kernel);
+    clReleaseKernel(vectorKernal);
     clReleaseProgram(program);
     clReleaseContext(context);
     return 0;
