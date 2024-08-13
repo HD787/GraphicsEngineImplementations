@@ -6,16 +6,7 @@
 #include "normalTransformKernel.cl"
 
 
-int vertexKernal(renderContext* rc, ) {
-
-    float matrix[16] = { 1.0f, 0.0f, 0.0f, 5.0f,
-                         0.0f, 1.0f, 0.0f, 4.0f,
-                         0.0f, 0.0f, 1.0f, 3.0f,
-                         0.0f, 0.0f, 0.0f, 1.0f
-                       };
-    float vector[4] = { 6.0f, 7.0f, 8.0f, 9.0f };
-
-    float result[4];
+int vertexKernal(renderContext* rc, transformSpec* ts, scene* sc, vertexBuffer* vb, colorBuffer* cb, normalBuffer* nb ) {
 
     cl_platform_id platform_id = NULL;
     cl_uint ret_num_platforms;
@@ -25,8 +16,8 @@ int vertexKernal(renderContext* rc, ) {
     cl_uint ret_num_devices;
     clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_DEFAULT, 1, &device_id, &ret_num_devices);
 
-
     cl_context context = clCreateContext(NULL, 1, &device_id, NULL, NULL, NULL);
+
     int lenArray[2] = { strlen(vertexKernelSource), strlen(normalKernelSource) };
     char* kernelSources[2] = { vertexKernelSource, normalKernelSource };
     cl_program program = clCreateProgramWithSource(context, 1, &kernelSources, lenArray, NULL);
@@ -42,7 +33,7 @@ int vertexKernal(renderContext* rc, ) {
     size_t local_work_size = 4;
 
 
-    cl_mem vertexBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(vector), NULL, NULL);
+    cl_mem vertexBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, vb->length, NULL, NULL);
     cl_mem matrixBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(matrix), NULL, NULL);
     cl_mem vertexResultBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(result), NULL, NULL);
     cl_mem normalBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(result), NULL, NULL);
