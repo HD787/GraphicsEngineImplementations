@@ -34,10 +34,11 @@ int vertexKernal(renderContext* rc, transformSpec* ts, scene* sc, vertexBuffer* 
 
 
     cl_mem vertexBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, vb->length, NULL, NULL);
+    //TODO
     cl_mem matrixBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(matrix), NULL, NULL);
-    cl_mem vertexResultBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(result), NULL, NULL);
-    cl_mem normalBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(result), NULL, NULL);
-    cl_mem normalResultBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(result), NULL, NULL);
+    cl_mem vertexResultBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, vb->length, NULL, NULL);
+    cl_mem normalBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, nb->length, NULL, NULL);
+    cl_mem normalResultBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, nb->length, NULL, NULL);
 
     //NOT DONE
     clEnqueueWriteBuffer(command_queue, matrix_buffer, CL_TRUE, 0, sizeof(matrix), matrix, 0, NULL, NULL);
