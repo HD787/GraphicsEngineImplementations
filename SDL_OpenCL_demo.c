@@ -9,17 +9,15 @@
 #include "GraphicsEngine/engineTypes.h"
 #include "GraphicsEngine/graphicsEngineFunctions.c"
 #include "transforms.c"
-//#include "NEON_transforms.c"
 #include "commonCoords.c"
 #include "GraphicsEngine/OBJParser/parser.c"
+#include "OpenCL_transforms.c"
 
 #define TRANSLATION_SPEED 0.5f
 #define ANGLE_INCREMENT 1.0f
 int main(){
 
-
     renderContext* rc = createRenderContext(900, 700);
-    
 
     /*START OF SDL BOILERPLATE*/
     SDL_Init(SDL_INIT_VIDEO);
@@ -40,7 +38,7 @@ int main(){
     SDL_UpdateTexture(texture, NULL, rc->frameBuffer, rc->width * 3);
 
     /*END OF SDL BOILERPLATE*/
-
+    
 
     object* obj = parseNoMTL("forestPondFixed.obj");
     vertexBuffer* vb0 = createVertexBuffer(obj->faceCount * 9);
@@ -82,6 +80,11 @@ int main(){
     matrix4x4 rodMatrix;
     createRotationMatrix(0.0, 0.0, 0.0, 0.0, rodMatrix);
     
+
+    /*START OF OPENCL BOILER PLATE*/
+    cl_context clcontext = createOpenCLContext();
+    buildKernels(clcontext, ts, sc, vb, cb, nb);
+    /*END OF OPENCL BOILER PLATE*/
 
     int quit = 0;
     SDL_Event e;
