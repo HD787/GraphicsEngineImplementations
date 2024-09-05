@@ -4,7 +4,7 @@
 
 #include "transformKernel.cl"
 
-cl_context createOpenCLContext(){
+openClResources createOpenClResources(){
     cl_platform_id platform_id = NULL;
     cl_uint ret_num_platforms;
     clGetPlatformIDs(1, &platform_id, &ret_num_platforms);
@@ -12,20 +12,24 @@ cl_context createOpenCLContext(){
     cl_device_id device_id = NULL;
     cl_uint ret_num_devices;
     clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_DEFAULT, 1, &device_id, &ret_num_devices);
-    return clCreateContext(NULL, 1, &device_id, NULL, NULL, NULL);
+    clCreateContext(NULL, 1, &device_id, NULL, NULL, NULL);
+    createOpenClResources clr;
+    clr.context = clCreateContext(NULL, 1, &device_id, NULL, NULL, NULL);
+    return clr;
 }
 
-int BuildKernels(cl_context context, transformSpec* ts, scene* sc, vertexBuffer* vb, colorBuffer* cb, normalBuffer* nb) {
+int BuildKernels(createOpenClResources* clr, transformSpec* ts, scene* sc, vertexBuffer* vb, colorBuffer* cb, normalBuffer* nb) {
 
 
     int lenArray[2] = { strlen(vectorKernalSource), strlen(normalVectorSource)}
-    cl_program program = clCreateProgramWithSource(context, 1, &kernelSource, lenArray, NULL);
-    clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
+    clr->program = clCreateProgramWithSource(context, 1, &kernelSource, lenArray, NULL);
+    clBuildProgram(clr->program, 1, &device_id, NULL, NULL, NULL);
+    clr->kernelCount = 2
+    clr->kernels = malloc(sizeof(cl_kernel) * clr->kernelCount);
+    cl_kernel vertexKernal = clCreateKernel(clr->program, "vertexTransforms", NULL);
+    cl_kernel normalKernal = clCreateKernal(clr->program, "normalTransforms", NULL);
 
-    cl_kernel vertexKernal = clCreateKernel(program, "vertexTransforms", NULL);
-    cl_kernel normalKernal = clCreateKernal(program, "normalTransforms", NULL);
-
-    cl_command_queue command_queue = clCreateCommandQueue(context, device_id, 0, NULL);
+    clr->commandQueue = clCreateCommandQueue(clr->context, device_id, 0, NULL);
 
     
     size_t globalVertexWorkSize = vb->length; 
@@ -35,36 +39,40 @@ int BuildKernels(cl_context context, transformSpec* ts, scene* sc, vertexBuffer*
     size_t localNormalWorkSize = 4;
 
 
-    cl_mem vertexBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float) * vb->length, NULL, NULL);
-    cl_mem vertexOutputBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float) * vb->length, NULL, NULL);
+    cl_mem vertexBuffer = clCreateBuffer(clr->context, CL_MEM_READ_WRITE, sizeof(float) * vb->length, NULL, NULL);
+    cl_mem vertexOutputBuffer = clCreateBuffer(clr->context, CL_MEM_READ_WRITE, sizeof(float) * vb->length, NULL, NULL);
 
-    cl_mem normalBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float) * nb->length, NULL, NULL);
-    cl_mem normalOutputBuffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float) * nb->length, NULL, NULL);
+    cl_mem normalBuffer = clCreateBuffer(clr->context, CL_MEM_READ_WRITE, sizeof(float) * nb->length, NULL, NULL);
+    cl_mem normalOutputBuffer = clCreateBuffer(clr->context, CL_MEM_READ_WRITE, sizeof(float) * nb->length, NULL, NULL);
 
-    //TODO
-    cl_mem matrix_buffer = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(float) * , NULL, NULL);
+    cl_mem matrix_buffer = clCreateBuffer(clr->context, CL_MEM_READ_WRITE, sizeof(float) * , NULL, NULL);
 
-    clEnqueueWriteBuffer(command_queue, vertexBuffer, CL_TRUE, 0, sizeof(float) * vb->length, vb->vertices, 0, NULL, NULL);
-    clEnqueueWriteBuffer(command_queue, normalBuffer, CL_TRUE, 0, sizeof(float) * nb->length, nb->normals, 0, NULL, NULL);
+    clEnqueueWriteBuffer(clr->commandQueue, vertexBuffer, CL_TRUE, 0, sizeof(float) * vb->length, vb->vertices, 0, NULL, NULL);
+    clEnqueueWriteBuffer(clr->commandQueue, normalBuffer, CL_TRUE, 0, sizeof(float) * nb->length, nb->normals, 0, NULL, NULL);
 
 
     clSetKernelArg(vertexKernal, 0, sizeof(cl_mem), &vertexBuffer);
     clSetKernelArg(vertexKernal, 1, sizeof(cl_mem), &matrixBuffer);
     clSetKernelArg(vertexKernal, 2, sizeof(cl_mem), &vertexOutputBuffer);
-    //TODO
+
     clSetKernelArg(vertexKernal, 3, sizeof(int), &(int){4});
 
-    clEnqueueNDRangeKernel(command_queue, vertexKernal, 1, NULL, &global_work_size, &local_work_size, 0, NULL, NULL);
+    clEnqueueNDRangeKernel(clr->commandQueue, vertexKernal, 1, NULL, &global_work_size, &local_work_size, 0, NULL, NULL);
 
-    clEnqueueReadBuffer(command_queue, vertexOutputBuffer, CL_TRUE, 0, sizeof(result), result, 0, NULL, NULL);
+    clEnqueueReadBuffer(clr->commandQueue, vertexOutputBuffer, CL_TRUE, 0, sizeof(result), result, 0, NULL, NULL);
 
-    for(int i = 0; i < 4; i++){
-        printf("%f ",result[i]);
-    }
-
-    clReleaseCommandQueue(command_queue);
-    clReleaseKernel(vertexKernal);
-    clReleaseProgram(program);
-    clReleaseContext(context);
     return 0;
+}
+
+void callKernels(openClResources* clr){
+    for(int i = 0; i < clr->kernelCount)
+}
+
+void deleteClContext(openClResources* clr){
+    clReleaseCommandQueue(clr->command_queue);
+    clReleaseProgram(clr->program);
+    clReleaseContext(clr->context);
+    for(int i = 0; i < clr->kernelCount; i++){
+        clReleaseKernel(clr->kernels[i]);
+    }
 }

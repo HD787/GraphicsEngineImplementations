@@ -82,7 +82,7 @@ int main(){
     
 
     /*START OF OPENCL BOILER PLATE*/
-    cl_context clcontext = createOpenCLContext();
+    OpenClResources clr = createOpenCLContext;
     buildKernels(clcontext, ts, sc, vb, cb, nb);
     /*END OF OPENCL BOILER PLATE*/
 
