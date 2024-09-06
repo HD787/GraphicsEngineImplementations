@@ -57,15 +57,27 @@ int BuildKernels(createOpenClResources* clr, transformSpec* ts, scene* sc, verte
 
     clSetKernelArg(vertexKernal, 3, sizeof(int), &(int){4});
 
-    clEnqueueNDRangeKernel(clr->commandQueue, vertexKernal, 1, NULL, &global_work_size, &local_work_size, 0, NULL, NULL);
+    // clEnqueueNDRangeKernel(clr->commandQueue, vertexKernal, 1, NULL, &global_work_size, &local_work_size, 0, NULL, NULL);
 
-    clEnqueueReadBuffer(clr->commandQueue, vertexOutputBuffer, CL_TRUE, 0, sizeof(result), result, 0, NULL, NULL);
+    // clEnqueueReadBuffer(clr->commandQueue, vertexOutputBuffer, CL_TRUE, 0, sizeof(result), result, 0, NULL, NULL);
 
     return 0;
 }
 
-void callKernels(openClResources* clr){
-    for(int i = 0; i < clr->kernelCount)
+void callKernels(openClResources* clr, vertexbuffer* vb, normalBuffer* nb){
+    //how am i gonna handle this
+    size_t globalVertexWorkSize = vb->length; 
+    size_t local_work_size = 4;
+
+    size_t globalNormalWorkSize = nb->length;
+    size_t localNormalWorkSize = 4;
+    for(int i = 0; i < clr->kernelCount; i++){
+        clEnqueueNDRangeKernel(clr->commandQueue, clr->kernels[i], NULL, &vb->length, &local_work_size, 0, NULL, NULL);
+    }
+}
+
+void readData(openClResources clr){
+   clEnqueueReadBuffer(clr->commandQueue, vertexOutputBuffer, CL_TRUE, 0, sizeof(result), result, 0, NULL, NULL); 
 }
 
 void deleteClContext(openClResources* clr){
