@@ -76,8 +76,8 @@ void callKernels(openClResources* clr, vertexbuffer* vb, normalBuffer* nb){
     }
 }
 
-void readData(openClResources clr){
-   clEnqueueReadBuffer(clr->commandQueue, vertexOutputBuffer, CL_TRUE, 0, sizeof(result), result, 0, NULL, NULL); 
+void readData(openClResources clr, vertexBuffer* vb){
+    clEnqueueReadBuffer(clr->commandQueue, vb->vertexOutputBuffer, CL_TRUE, 0, sizeof(result), result, 0, NULL, NULL); 
 }
 
 void deleteClContext(openClResources* clr){
