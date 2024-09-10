@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <OpenCL/opencl.h>
 
-#include "transformKernel.cl"
+#include "vertexTransformKernel.cl"
 
 openClResources createOpenClResources(){
     cl_platform_id platform_id = NULL;

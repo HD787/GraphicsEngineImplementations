@@ -4,6 +4,7 @@
 
 #include <SDL.h>
 #include <string.h>
+#include "OpenCL_transforms.c"
 #include "GraphicsEngine/raster/rasterizer.c"
 #include "GraphicsEngine/3Dmath/operations.c"
 #include "GraphicsEngine/engineTypes.h"
@@ -115,7 +116,9 @@ int main(){
             vertexBuffer* vb = sc->meshes[j]->vb;
             colorBuffer* cb = sc->meshes[j]->cb;
             normalBuffer* nb = sc->meshes[j]->nb;
-            transform(rc, transformations, sc, vb, cb, nb);
+            callKernels(clr, vb, nb);
+            readKernels(clr, vbn nb);
+            //transform(rc, transformations, sc, vb, cb, nb);
             rasterize(rc, vb, cb);
         }       
         SDL_UpdateTexture(texture, NULL, rc->frameBuffer, rc->width * 3);
@@ -124,6 +127,7 @@ int main(){
         cleanRenderContext(rc);
     }
     deleteRenderContext(rc);
+    deleteClContext(clr);
     //dont forget to free the vertex buffers
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
