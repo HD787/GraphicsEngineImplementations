@@ -19,8 +19,6 @@ openClResources createOpenClResources(){
 }
 
 int BuildKernels(createOpenClResources* clr, transformSpec* ts, scene* sc, vertexBuffer* vb, colorBuffer* cb, normalBuffer* nb) {
-
-
     int lenArray[2] = { strlen(vectorKernalSource), strlen(normalVectorSource)}
     clr->program = clCreateProgramWithSource(context, 1, &kernelSource, lenArray, NULL);
     clBuildProgram(clr->program, 1, &device_id, NULL, NULL, NULL);
@@ -31,7 +29,6 @@ int BuildKernels(createOpenClResources* clr, transformSpec* ts, scene* sc, verte
 
     clr->commandQueue = clCreateCommandQueue(clr->context, device_id, 0, NULL);
 
-    
     size_t globalVertexWorkSize = vb->length; 
     size_t local_work_size = 4;
 
@@ -57,10 +54,6 @@ int BuildKernels(createOpenClResources* clr, transformSpec* ts, scene* sc, verte
 
     clSetKernelArg(vertexKernal, 3, sizeof(int), &(int){4});
 
-    // clEnqueueNDRangeKernel(clr->commandQueue, vertexKernal, 1, NULL, &global_work_size, &local_work_size, 0, NULL, NULL);
-
-    // clEnqueueReadBuffer(clr->commandQueue, vertexOutputBuffer, CL_TRUE, 0, sizeof(result), result, 0, NULL, NULL);
-
     return 0;
 }
 
@@ -71,13 +64,13 @@ void callKernels(openClResources* clr, vertexbuffer* vb, normalBuffer* nb){
 
     size_t globalNormalWorkSize = nb->length;
     size_t localNormalWorkSize = 4;
-    for(int i = 0; i < clr->kernelCount; i++){
-        clEnqueueNDRangeKernel(clr->commandQueue, clr->kernels[i], NULL, &vb->length, &local_work_size, 0, NULL, NULL);
-    }
+    clEnqueueNDRangeKernel(clr->commandQueue, clr->vertexKernel, NULL, &vb->length, &local_work_size, 0, NULL, NULL);
+    clEnqueueNDRangeKernel(clr->commandQueue, clr->normalKernel, NULL, &nb->length, &local_work_size, 0, NULL, NULL);
 }
 
-void readData(openClResources clr, vertexBuffer* vb){
+void readData(openClResources clr, vertexBuffer* vb, normalBuffer* nb){
     clEnqueueReadBuffer(clr->commandQueue, vb->vertexOutputBuffer, CL_TRUE, 0, sizeof(result), result, 0, NULL, NULL); 
+    clEnqueueReadBuffer(clr->commandQueue, vb->normalOuputBuffer, CL_TRUE, 0, sizeof(results), result, 0, NULL, NULL);
 }
 
 void deleteClContext(openClResources* clr){
