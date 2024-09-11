@@ -80,12 +80,14 @@ int main(){
     matrix4x4 rotationMatrixX, rotationMatrixY, rotationMatrixZ, translationMatrix, scalingMatrix, perspectiveProjectionMatrix, screenSpaceMatrix;
     matrix4x4 rodMatrix;
     createRotationMatrix(0.0, 0.0, 0.0, 0.0, rodMatrix);
-    
+    float matrixBuffer[16*]
 
     /*START OF OPENCL BOILER PLATE*/
+    
     OpenClResources clr = createOpenCLContext;
     buildKernels(clcontext, ts, sc, vb, cb, nb);
     /*END OF OPENCL BOILER PLATE*/
+
 
     int quit = 0;
     SDL_Event e;
@@ -117,7 +119,7 @@ int main(){
             colorBuffer* cb = sc->meshes[j]->cb;
             normalBuffer* nb = sc->meshes[j]->nb;
             callKernels(clr, vb, nb);
-            readKernels(clr, vbn nb);
+            readKernels(clr, vb, nb);
             //transform(rc, transformations, sc, vb, cb, nb);
             rasterize(rc, vb, cb);
         }       

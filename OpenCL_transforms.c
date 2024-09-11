@@ -18,7 +18,7 @@ openClResources createOpenClResources(){
     return clr;
 }
 
-int BuildKernels(createOpenClResources* clr, transformSpec* ts, scene* sc, vertexBuffer* vb, colorBuffer* cb, normalBuffer* nb) {
+int BuildKernels(createOpenClResources* clr, transformSpec* ts, scene* sc, vertexBuffer* vb, colorBuffer* cb, normalBuffer* nb, float* mb) {
     int lenArray[2] = { strlen(vectorKernalSource), strlen(normalVectorSource)}
     clr->program = clCreateProgramWithSource(context, 1, &kernelSource, lenArray, NULL);
     clBuildProgram(clr->program, 1, &device_id, NULL, NULL, NULL);
@@ -57,7 +57,7 @@ int BuildKernels(createOpenClResources* clr, transformSpec* ts, scene* sc, verte
     return 0;
 }
 
-void callKernels(openClResources* clr, vertexbuffer* vb, normalBuffer* nb){
+void callKernels(openClResources* clr, vertexbuffer* vb, normalBuffer* nb, transformSpec* ts){
     //how am i gonna handle this
     size_t globalVertexWorkSize = vb->length; 
     size_t local_work_size = 4;

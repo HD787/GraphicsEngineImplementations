@@ -2,6 +2,7 @@
 //there is a reason they use programmable vertex shaders
 //this could be quite restrictive
 void transform(renderContext* rc, transformSpec* ts, scene* sc, vertexBuffer* vb, colorBuffer* cb, normalBuffer* nb){
+    //never put together how bad this is, cant be allocating memory like this, way to slow
     matrix4x4 rotationMatrixX, rotationMatrixY, rotationMatrixZ, translationMatrix, scalingMatrix, perspectiveProjectionMatrix, screenSpaceMatrix;
     vec3 light; light.x = 0; light.y = 0; light.z = -1.0;
     createRotationMatrixX(ts->rotateX, rotationMatrixX);
