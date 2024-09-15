@@ -119,7 +119,7 @@ int main(){
             vertexBuffer* vb = sc->meshes[j]->vb;
             colorBuffer* cb = sc->meshes[j]->cb;
             normalBuffer* nb = sc->meshes[j]->nb;
-            setKernelArgs(clr, vb, nb, transformations, matrixBuffer)
+            setKernelArgs(clr, vb, nb, transformations, matrixBuffer);
             callKernels(clr, vb, nb);
             readKernels(clr, vb, nb);
             //transform(rc, transformations, sc, vb, cb, nb);
