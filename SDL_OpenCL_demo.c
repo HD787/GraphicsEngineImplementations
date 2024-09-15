@@ -77,10 +77,11 @@ int main(){
     transformations->rotateZ = 0.0;
 
     //update matrices
-    matrix4x4 rotationMatrixX, rotationMatrixY, rotationMatrixZ, translationMatrix, scalingMatrix, perspectiveProjectionMatrix, screenSpaceMatrix;
+    matrix4x4 rotationMatrixX, rotationMatrixY, rotationMatrixZ, translationMatrix, perspectiveProjectionMatrix;
     matrix4x4 rodMatrix;
     createRotationMatrix(0.0, 0.0, 0.0, 0.0, rodMatrix);
-    float matrixBuffer[16*]
+    float matrixBuffer[16*5];
+    
 
     /*START OF OPENCL BOILER PLATE*/
     
@@ -118,6 +119,7 @@ int main(){
             vertexBuffer* vb = sc->meshes[j]->vb;
             colorBuffer* cb = sc->meshes[j]->cb;
             normalBuffer* nb = sc->meshes[j]->nb;
+            setKernelArgs(clr, vb, nb, transformations, matrixBuffer)
             callKernels(clr, vb, nb);
             readKernels(clr, vb, nb);
             //transform(rc, transformations, sc, vb, cb, nb);

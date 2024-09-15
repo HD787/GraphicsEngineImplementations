@@ -19,6 +19,9 @@ openClResources createOpenClResources(){
 }
 
 int BuildKernels(createOpenClResources* clr, transformSpec* ts, scene* sc, vertexBuffer* vb, colorBuffer* cb, normalBuffer* nb, float* mb) {
+ 
+    
+
     int lenArray[2] = { strlen(vectorKernalSource), strlen(normalVectorSource)}
     clr->program = clCreateProgramWithSource(context, 1, &kernelSource, lenArray, NULL);
     clBuildProgram(clr->program, 1, &device_id, NULL, NULL, NULL);
@@ -48,13 +51,31 @@ int BuildKernels(createOpenClResources* clr, transformSpec* ts, scene* sc, verte
     clEnqueueWriteBuffer(clr->commandQueue, normalBuffer, CL_TRUE, 0, sizeof(float) * nb->length, nb->normals, 0, NULL, NULL);
 
 
+    
+
+    return 0;
+}
+
+void setKernelArgs(openClResources* clr, vertexbuffer* vb, normalBuffer* nb, transformSpec* ts, float* mb){
+    matrix4x4 rotationMatrixX, rotationMatrixY, rotationMatrixZ, translationMatrix, perspectiveProjectionMatrix;
+    rotationMatrixX = mb;
+    rotationMatrixY = mb + 16;
+    rotationMatrixZ = mb + 32;
+    translationMatrix = mb + 48;
+    perspecticeProjectionMatrix = mb + 64;
+    
+    createRotationMatrixX(ts->rotateX, rotationMatrixX);
+    createRotationMatrixY(ts->rotateY, rotationMatrixY);
+    createRotationMatrixZ(ts->rotateZ, rotationMatrixZ);
+    createTranslationMatrix(ts->translateX, ts->translateY, ts->translateZ, translationMatrix);
+    createPerspectiveProjectionMatrix(45.0, 1.0, 10.0, 1000.0/700.0, perspectiveProjectionMatrix);
+
+    
     clSetKernelArg(vertexKernal, 0, sizeof(cl_mem), &vertexBuffer);
     clSetKernelArg(vertexKernal, 1, sizeof(cl_mem), &matrixBuffer);
     clSetKernelArg(vertexKernal, 2, sizeof(cl_mem), &vertexOutputBuffer);
 
     clSetKernelArg(vertexKernal, 3, sizeof(int), &(int){4});
-
-    return 0;
 }
 
 void callKernels(openClResources* clr, vertexbuffer* vb, normalBuffer* nb, transformSpec* ts){
