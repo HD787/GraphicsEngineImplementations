@@ -4,15 +4,15 @@
 
 #include <SDL.h>
 #include <string.h>
-#include "OpenCL_transforms.c"
+
 #include "GraphicsEngine/raster/rasterizer.c"
 #include "GraphicsEngine/3Dmath/operations.c"
 #include "GraphicsEngine/engineTypes.h"
 #include "GraphicsEngine/graphicsEngineFunctions.c"
+#include "OpenCL_transforms.c"
 #include "transforms.c"
 #include "commonCoords.c"
 #include "GraphicsEngine/OBJParser/parser.c"
-#include "OpenCL_transforms.c"
 
 #define TRANSLATION_SPEED 0.5f
 #define ANGLE_INCREMENT 1.0f
@@ -85,8 +85,8 @@ int main(){
 
     /*START OF OPENCL BOILER PLATE*/
     
-    OpenClResources clr = createOpenCLContext;
-    buildKernels(clcontext, ts, sc, vb, cb, nb);
+    openClResources clr = createOpenClResources();
+    buildKernels(&clr, transformations, rc, vb0, cb0, nb0, matrixBuffer);
     /*END OF OPENCL BOILER PLATE*/
 
 
@@ -119,9 +119,9 @@ int main(){
             vertexBuffer* vb = sc->meshes[j]->vb;
             colorBuffer* cb = sc->meshes[j]->cb;
             normalBuffer* nb = sc->meshes[j]->nb;
-            setKernelArgs(clr, vb, nb, transformations, matrixBuffer);
-            callKernels(clr, vb, nb);
-            readKernels(clr, vb, nb);
+            setKernelArgs(&clr, transformations, matrixBuffer);
+            callKernels(&clr, vb);
+            readData(&clr, vb, cb);
             //transform(rc, transformations, sc, vb, cb, nb);
             rasterize(rc, vb, cb);
         }       
@@ -131,7 +131,7 @@ int main(){
         cleanRenderContext(rc);
     }
     deleteRenderContext(rc);
-    deleteClContext(clr);
+    deleteClContext(&clr);
     //dont forget to free the vertex buffers
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);

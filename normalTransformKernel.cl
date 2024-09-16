@@ -9,7 +9,7 @@ const char *normalKernelSource =
     "vector[2] = matrix[8] * x + matrix[9] * y + matrix[10] * z + matrix[11] * w;"
     "vector[3] = matrix[12] * x + matrix[13] * y + matrix[14] * z + matrix[15] * w;"
 "}"
-"__kernel void transformNormals(__global const float* normals, "
+"__kernel void normalTransforms(__global const float* normals,"
                                 "__global const float* matrices,"
                                 "__global float* outputNormals,"
                                 "const int matrixCount) { "
@@ -18,7 +18,7 @@ const char *normalKernelSource =
     "for(int i = 0; i < 3; i++){ temp[normal + i] = normals[normal + i]; }"
     "temp[3] = 1.0;"
     "for(int i = 0; i < matrixCount * 16; i += 16){"
-    "   matrixByVector(&matrices[i], temp)"
+    "   matrixByVector(&matrices[i], temp);"
     "}"
     "for(int i = 0; i < 3; i++) { outputNormals[normal + i] = temp[i]; }"
-"}"
+"}";
