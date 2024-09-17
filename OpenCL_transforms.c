@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <OpenCL/opencl.h>
 
-#include "vertexTransformKernel.cl"
+#include "transformKernel.cl"
 
 typedef struct{
     cl_context context;
