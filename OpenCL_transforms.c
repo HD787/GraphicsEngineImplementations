@@ -4,6 +4,17 @@
 
 #include "vertexTransformKernel.cl"
 
+typedef struct{
+    cl_context context;
+    cl_device_id deviceId;
+    cl_program program;
+    cl_command_queue commandQueue;
+    cl_kernel kernel;
+    cl_mem vertexOutput;
+    cl_mem colorOutput;
+}openClResources;
+
+
 openClResources createOpenClResources(){
     openClResources clr;
     cl_platform_id platform_id = NULL;
@@ -13,14 +24,15 @@ openClResources createOpenClResources(){
     clr.deviceId = NULL;
     cl_uint ret_num_devices;
     clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_DEFAULT, 1, &clr.deviceId, &ret_num_devices);
-    clCreateContext(NULL, 1, clr.deviceId, NULL, NULL, NULL);
+    clCreateContext(NULL, 1, &clr.deviceId, NULL, NULL, NULL);
     clr.context = clCreateContext(NULL, 1, &clr.deviceId, NULL, NULL, NULL);
     return clr;
 }
 
 int buildKernels(openClResources* clr, transformSpec* ts, renderContext* rc, vertexBuffer* vb, colorBuffer* cb, normalBuffer* nb, float* mb) {
-    clr->program = clCreateProgramWithSource(clr->context, 1, &vertexKernelSource, strlen(vertexKernelSource), NULL);
-    clBuildProgram(clr->program, 1, clr->deviceId, NULL, NULL, NULL);
+    size_t size = strlen(vertexKernelSource);
+    clr->program = clCreateProgramWithSource(clr->context, 1, &vertexKernelSource, &size, NULL);
+    clBuildProgram(clr->program, 1, &clr->deviceId, NULL, NULL, NULL);
     clr->kernel = clCreateKernel(clr->program, "vertexTransforms", NULL);
 
     clr->commandQueue = clCreateCommandQueue(clr->context, clr->deviceId, 0, NULL);
@@ -37,9 +49,9 @@ int buildKernels(openClResources* clr, transformSpec* ts, renderContext* rc, ver
 
     cl_mem normalBuffer = clCreateBuffer(clr->context, CL_MEM_READ_WRITE, sizeof(float) * nb->length, NULL, NULL);
 
-    clEnqueueWriteBuffer(clr->commandQueue, vb->vertices, CL_TRUE, 0, sizeof(float) * vb->length, vb->vertices, 0, NULL, NULL);
-    clEnqueueWriteBuffer(clr->commandQueue, nb->normals, CL_TRUE, 0, sizeof(float) * nb->length, nb->normals, 0, NULL, NULL);
-    clEnqueueWriteBuffer(clr->commandQueue, cb->colors, CL_TRUE, 0, sizeof(float) * cb->length, cb->colors, 0, NULL, NULL);
+    clEnqueueWriteBuffer(clr->commandQueue, vertexBuffer, CL_TRUE, 0, sizeof(float) * vb->length, vb->vertices, 0, NULL, NULL);
+    clEnqueueWriteBuffer(clr->commandQueue, normalBuffer, CL_TRUE, 0, sizeof(float) * nb->length, nb->normals, 0, NULL, NULL);
+    clEnqueueWriteBuffer(clr->commandQueue, colorBuffer, CL_TRUE, 0, sizeof(float) * cb->length, cb->colors, 0, NULL, NULL);
 
     clSetKernelArg(clr->kernel, 0, sizeof(cl_mem), &vertexBuffer);
     clSetKernelArg(clr->kernel, 1, sizeof(cl_mem), &colorBuffer);
@@ -76,14 +88,14 @@ void setKernelArgs(openClResources* clr, transformSpec* ts, float* mb){
 }
 
 void callKernels(openClResources* clr, vertexBuffer* vb){
-    size_t globalVertexWorkSize = vb->length; 
-    size_t local_work_size = 4;
-    clEnqueueNDRangeKernel(clr->commandQueue, clr->kernel, NULL, &vb->length, &local_work_size, 0, NULL, NULL);
+    size_t globalWorkSize = sizeof(float) * vb->length; 
+    size_t localWorkSize = 4;
+    clEnqueueNDRangeKernel(clr->commandQueue, clr->kernel, 1, NULL, &globalWorkSize, &localWorkSize, 0, NULL, NULL);
 }
 
 void readData(openClResources* clr, vertexBuffer* vb, colorBuffer* cb){
-    clEnqueueReadBuffer(clr->commandQueue, vb->vertices, CL_TRUE, 0, sizeof(cl_mem), clr->vertexOutput, 0, NULL, NULL); 
-    clEnqueueReadBuffer(clr->commandQueue, cb->colors, CL_TRUE, 0, sizeof(cl_mem), clr->colorOutput, 0, NULL, NULL);
+    clEnqueueReadBuffer(clr->commandQueue, clr->vertexOutput, CL_TRUE, 0, sizeof(cl_mem), vb->vertices, 0, NULL, NULL); 
+    clEnqueueReadBuffer(clr->commandQueue, clr->colorOutput, CL_TRUE, 0, sizeof(cl_mem), cb->colors, 0, NULL, NULL);
 }
 
 void deleteClContext(openClResources* clr){
