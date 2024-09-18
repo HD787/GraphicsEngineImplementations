@@ -30,10 +30,10 @@ openClResources createOpenClResources(){
 }
 
 int buildKernels(openClResources* clr, transformSpec* ts, renderContext* rc, vertexBuffer* vb, colorBuffer* cb, normalBuffer* nb, float* mb) {
-    size_t size = strlen(vertexKernelSource);
-    clr->program = clCreateProgramWithSource(clr->context, 1, &vertexKernelSource, &size, NULL);
+    size_t size = strlen(kernelSource);
+    clr->program = clCreateProgramWithSource(clr->context, 1, &kernelSource, &size, NULL);
     clBuildProgram(clr->program, 1, &clr->deviceId, NULL, NULL, NULL);
-    clr->kernel = clCreateKernel(clr->program, "vertexTransforms", NULL);
+    clr->kernel = clCreateKernel(clr->program, "transforms", NULL);
 
     clr->commandQueue = clCreateCommandQueue(clr->context, clr->deviceId, 0, NULL);
 
