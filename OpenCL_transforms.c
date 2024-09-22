@@ -88,7 +88,7 @@ void setKernelArgs(openClResources* clr, transformSpec* ts, float* mb){
 }
 
 void callKernels(openClResources* clr, vertexBuffer* vb){
-    size_t globalWorkSize = sizeof(float) * vb->length; 
+    size_t globalWorkSize = vb->length; 
     size_t localWorkSize = 4;
     clEnqueueNDRangeKernel(clr->commandQueue, clr->kernel, 1, NULL, &globalWorkSize, &localWorkSize, 0, NULL, NULL);
 }
