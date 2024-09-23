@@ -36,9 +36,6 @@ int main(){
                                              format, SDL_TEXTUREACCESS_STREAMING,
                                              rc->width, rc->height);
     if(!texture){printf("%s", SDL_GetError()); return 0;}
-
-    SDL_UpdateTexture(texture, NULL, rc->frameBuffer, rc->width * 3);
-
     /*END OF SDL BOILERPLATE*/
 
 
